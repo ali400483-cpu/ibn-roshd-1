@@ -19,7 +19,9 @@ if (!/^https:\/\/[a-z0-9-]+\.supabase\.co\/?$/i.test(SUPABASE_URL)) {
 if (!window.supabase || typeof window.supabase.createClient !== 'function') {
   throw new Error('تعذر تحميل مكتبة Supabase. تحقق من الاتصال بالإنترنت.');
 }
-const client = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+const client = window.supabase.createClient(URL.trim(), KEY.trim());
+
 let rows=[],remote=false,editId=null,user=null,role=null;
 const $=id=>document.getElementById(id),esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 function render(){let q=$('search').value.trim().toLowerCase(),f=$('filter').value;let shown=rows.filter(r=>(!f||r.data['الحالة']===f)&&JSON.stringify(r.data).toLowerCase().includes(q));$('head').innerHTML=headers.map(h=>'<th>'+esc(h)+'</th>').join('')+'<th>إجراءات</th>';$('body').innerHTML=shown.map(r=>'<tr>'+headers.map(h=>'<td>'+(h==='الشواهد'?evidenceHTML(r):esc(r.data[h]))+'</td>').join('')+'<td><div class="actions"><button data-edit="'+esc(r.id)+'">تعديل</button><button class="danger" data-del="'+esc(r.id)+'">حذف</button></div></td></tr>').join('');$('total').textContent=rows.length;$('evidence').textContent=rows.reduce((n,r)=>n+(r.files||[]).length,0);let vals=[...new Set(rows.map(r=>r.data['الحالة']).filter(Boolean))];$('filter').innerHTML='<option value="">كل الحالات</option>'+vals.map(v=>'<option '+(v===f?'selected':'')+'>'+esc(v)+'</option>').join('')}
